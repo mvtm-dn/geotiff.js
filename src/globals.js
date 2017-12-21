@@ -229,14 +229,20 @@ for (key in geoKeyNames) {
   geoKeys[geoKeyNames[key]] = parseInt(key);
 }
 
-var parseXml;
+var parseXml,_xpathResult;
 // node.js version
 if (typeof window === "undefined") {
+  let DOMParser = require('xmldom').DOMParser,
+    xpath = require('xpath');
   parseXml = function(xmlStr) {
     // requires xmldom module
-    var DOMParser = require('xmldom').DOMParser;
-    return ( new DOMParser() ).parseFromString(xmlStr, "text/xml");
+    var ret=(new DOMParser()).parseFromString(xmlStr, "text/xml");
+    ret.evaluate=function(expr,context,resolver,type,result) {
+      return xpath.evaluate(expr,context,resolver,type,result);
+    };
+    return ret;
   };
+  _xpathResult=xpath.XPathResult;
 }
 else if (typeof window.DOMParser !== "undefined") {
   parseXml = function(xmlStr) {
@@ -261,5 +267,6 @@ module.exports = {
   photometricInterpretations: photometricInterpretations,
   geoKeys: geoKeys,
   geoKeyNames: geoKeyNames,
-  parseXml: parseXml
+  parseXml: parseXml,
+  XPathResult: typeof XPathResult==='undefined'?_xpathResult:XPathResult
 };

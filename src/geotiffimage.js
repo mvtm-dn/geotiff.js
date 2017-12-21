@@ -793,11 +793,22 @@ GeoTIFFImage.prototype = {
     var xmlDom = globals.parseXml(string.substring(0, string.length-1));
     var result = xmlDom.evaluate(
       "GDALMetadata/Item", xmlDom, null,
-      XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null
+      globals.XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null
     );
     for (var i=0; i < result.snapshotLength; ++i) {
-      var node = result.snapshotItem(i);
-      metadata[node.getAttribute("name")] = node.textContent;
+      var node = result.snapshotItem(i),name=node.getAttribute("name"),sample=node.getAttribute("sample");
+      if (sample) {
+        sample=Number.parseInt(sample);
+        var data=metadata[name];
+        if (!data || !Array.isArray(data)) {
+          data=[];
+          metadata[name]=data;
+        }
+        data[sample]=node.textContent;
+      }
+      else {
+        metadata[name] = node.textContent;
+      }
     }
     return metadata;
   },

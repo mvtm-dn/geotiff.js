@@ -97,7 +97,8 @@ module.exports = function(grunt) {
                         }]
                     ],
                     external: [
-                        "xmldom"
+                        "xmldom",
+			"xpath"
                     ]
                 },
             },
